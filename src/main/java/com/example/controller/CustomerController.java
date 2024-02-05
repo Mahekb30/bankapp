@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.entities.Customer;
 import com.example.services.CustomerService;
@@ -22,9 +24,13 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        List<Customer> customers = customerService.getAllCustomers();
-        if (customers.size() <= 0 ) {
+    public ResponseEntity<List<Customer>> getAllCustomers(
+        @RequestParam(required = false) String balance,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) Long accNo
+    ) {
+        List<Customer> customers = customerService.getAllCustomers(balance, name, accNo);
+        if (customers.size() <= 0) {
           return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(customers);
@@ -41,9 +47,15 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        Customer createdCustomer = customerService.createCustomer(customer);
-        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+    public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
+        try {
+          Customer createdCustomer = customerService.createCustomer(customer);
+          return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+        } catch(Exception e) {
+          String errorMessage = "Error creating customer: " + e.getMessage();
+          System.err.println(errorMessage);
+          return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")

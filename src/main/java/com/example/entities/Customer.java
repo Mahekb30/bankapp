@@ -1,5 +1,6 @@
 package com.example.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,11 +15,14 @@ public class Customer {
   
   private String name;
   
+  @Column(unique = true)
   private long accNo;
   
   private String accType;
   
   private String panCardNo;
+  
+  private Double balance;
 
   public int getId() {
     return id;
@@ -36,7 +40,7 @@ public class Customer {
     this.name = name;
   }
 
-  public long getAccNo() {
+  public Long getAccNo() {
     return accNo;
   }
 
@@ -60,24 +64,33 @@ public class Customer {
     this.panCardNo = panCardNo;
   }
 
-  public Customer(int id, String name, long accNo, String accType, String panCardNo) {
+  public Customer(int id, String name, long accNo, String accType, String panCardNo, double balance) {
     super();
     this.id = id;
     this.name = name;
     this.accNo = accNo;
     this.accType = accType;
     this.panCardNo = panCardNo;
+    this.balance = balance;
   }
 
   @Override
   public String toString() {
     return "Customer [id=" + id + ", name=" + name + ", accNo=" + accNo + ", accType=" + accType
-        + ", panCardNo=" + panCardNo + "]";
+        + ", panCardNo=" + panCardNo + ", balance=" + balance + "]";
   }
 
   public Customer() {
     super();
     // TODO Auto-generated constructor stub
+  }
+
+  public Double getBalance() {
+    return balance;
+  }
+
+  public void setBalance(double balance) {
+    this.balance = balance;
   }
   
 }
