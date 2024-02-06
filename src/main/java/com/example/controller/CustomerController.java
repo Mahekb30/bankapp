@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.dtos.CustomerRequestDto;
+import com.example.dtos.CustomerResponseDto;
 import com.example.entities.Customer;
 import com.example.services.CustomerService;
 
@@ -24,12 +26,12 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers(
+    public ResponseEntity<List<CustomerResponseDto>> getAllCustomers(
         @RequestParam(required = false) String balance,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Long accNo
     ) {
-        List<Customer> customers = customerService.getAllCustomers(balance, name, accNo);
+        List<CustomerResponseDto> customers = customerService.getAllCustomers(balance, name, accNo);
         if (customers.size() <= 0) {
           return ResponseEntity.notFound().build();
         }
@@ -37,8 +39,8 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable int id) {
-        Customer customer = customerService.getCustomerById(id);
+    public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable int id) {
+      CustomerResponseDto customer = customerService.getCustomerById(id);
         if (customer != null) {
           return ResponseEntity.ok(customer);
       } else {
@@ -47,10 +49,9 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Object> createCustomer(@RequestBody CustomerRequestDto customer) {
         try {
-          Customer createdCustomer = customerService.createCustomer(customer);
-          System.out.println(createdCustomer);
+          CustomerResponseDto createdCustomer = customerService.createCustomer(customer);
           return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
         } catch(Exception e) {
           String errorMessage = "Error creating customer: " + e.getMessage();
@@ -60,10 +61,8 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
-        System.out.println(id + " : " + customer);
-        Customer updatedCustomer = customerService.updateCustomer(id, customer);
-        System.out.println(updatedCustomer);
+    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable int id, @RequestBody CustomerRequestDto customer) {
+        CustomerResponseDto updatedCustomer = customerService.updateCustomer(id, customer);
         if (updatedCustomer != null) {
             return ResponseEntity.ok(updatedCustomer);
         } else {

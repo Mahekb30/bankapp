@@ -21,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import com.example.dtos.CustomerRequestDto;
+import com.example.dtos.CustomerResponseDto;
 import com.example.entities.Customer;
 import com.example.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,14 +40,16 @@ class CustomerControllerTest {
 
   @Autowired
   private ObjectMapper objectMapper;
-  private Customer customer1;
-  private Customer customer2;
-  private List<Customer> mockCustomers;
+  private CustomerRequestDto customer;
+  private CustomerResponseDto customer1;
+  private CustomerResponseDto customer2;
+  private List<CustomerResponseDto> mockCustomers;
  
   @BeforeEach
   public void init() {
-    customer1 = new Customer(1, "John", 6128137, "Savings", "GVGSVVCU", 1000.0);
-    customer2 = new Customer(2, "Jane", 12936126, "Current", "BSDAUCAVB", 1500.0);
+    customer = new CustomerRequestDto("John", 6128137, "Savings", "GVGSVVCU", 1000.0);
+    customer1 = new CustomerResponseDto(1, "John", 6128137, "Savings", "GVGSVVCU", 1000.0);
+    customer2 = new CustomerResponseDto(2, "Jane", 12936126, "Current", "BSDAUCAVB", 1500.0);
     
     mockCustomers = Arrays.asList(customer1, customer2);
   }
@@ -82,17 +86,17 @@ class CustomerControllerTest {
   @Test
   void createCustomer() throws Exception {
 
-    when(customerService.createCustomer(customer1)).thenReturn(customer1);
+    when(customerService.createCustomer(customer)).thenReturn(customer1);
     ResultActions response = mockMvc.perform(post("/customers")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(customer1)));
+        .content(objectMapper.writeValueAsString(customer)));
     response.andExpect(MockMvcResultMatchers.status().isCreated());
     
     // When Duplicate Account No is sent
     when(customerService.createCustomer(ArgumentMatchers.any())).thenThrow(new RuntimeException("Duplicate Account Number"));
     response = mockMvc.perform(post("/customers")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(customer1)));
+        .content(objectMapper.writeValueAsString(customer)));
     response.andExpect(MockMvcResultMatchers.status().isInternalServerError());
     
   }
@@ -102,16 +106,16 @@ class CustomerControllerTest {
 
     int id = 1;
    
-    when(customerService.updateCustomer(eq(id), ArgumentMatchers.any())).thenReturn(customer2);
+    when(customerService.updateCustomer(eq(id), ArgumentMatchers.any())).thenReturn(customer1);
     ResultActions response = mockMvc.perform(put("/customers/"+id)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(customer1)));
+        .content(objectMapper.writeValueAsString(customer)));
     response.andExpect(MockMvcResultMatchers.status().isOk());
     
     when(customerService.updateCustomer(eq(id), ArgumentMatchers.any())).thenReturn(null);
     response = mockMvc.perform(put("/customers/"+id)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(customer1)));
+        .content(objectMapper.writeValueAsString(customer)));
     response.andExpect(MockMvcResultMatchers.status().isNotFound());
   }
   

@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.dao.CustomerRepository;
+import com.example.dtos.CustomerRequestDto;
+import com.example.dtos.CustomerResponseDto;
 import com.example.entities.Customer;
 
 @Service
@@ -13,7 +15,7 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public List<Customer> getAllCustomers(String balance, String name, Long accNo) {
+    public List<CustomerResponseDto> getAllCustomers(String balance, String name, Long accNo) {
       
         List<Customer> customers =  customerRepository.findAll();
         customers = customers.stream().filter(customer -> 
@@ -22,25 +24,30 @@ public class CustomerService {
             && (balance == null || checkBalance(customer.getBalance(), balance))
         ).collect(Collectors.toList());
 
-        return customers;
+        
+        return customers.stream().map(customer -> mapToDto(customer)).toList();
     }
 
-    public Customer getCustomerById(int id) {
-        return customerRepository.findById(id).orElse(null);
+    public CustomerResponseDto getCustomerById(int id) {
+        return mapToDto(customerRepository.findById(id).orElse(null));
     }
 
-    public Customer createCustomer(Customer customer) {
+    public CustomerResponseDto createCustomer(CustomerRequestDto customer) {
         try {
-          return customerRepository.save(customer);
+          Customer customerEntity = mapToEntity(customer);
+          return mapToDto(customerRepository.save(customerEntity));
         } catch (Exception e) {
           throw new RuntimeException("Error creating customer: " + e.getMessage());
         }
     }
 
-    public Customer updateCustomer(int id, Customer customer) {
+    public CustomerResponseDto updateCustomer(int id, CustomerRequestDto customer) {
+      
+        Customer customerEntity = mapToEntity(customer);
+        
         if (customerRepository.existsById(id)) {
-            customer.setId(id);
-            return customerRepository.save(customer);
+            customerEntity.setId(id);
+            return mapToDto(customerRepository.save(customerEntity));
         }
         return null; // Handle not found scenario
     }
@@ -64,5 +71,34 @@ public class CustomerService {
     public CustomerService(CustomerRepository customerRepository) {
       super();
       this.customerRepository = customerRepository;
+    }
+    
+    private Customer mapToEntity(CustomerRequestDto customerRequest) {
+      
+      if(customerRequest == null) return null;
+      
+      Customer customer = new Customer();
+      customer.setName(customerRequest.getName());
+      customer.setAccNo(customerRequest.getAccNo());
+      customer.setAccType(customerRequest.getAccType());
+      customer.setBalance(customerRequest.getBalance());
+      customer.setPanCardNo(customerRequest.getPanCardNo());
+      return customer;
+     
+    }
+    
+    private CustomerResponseDto mapToDto(Customer customer) {
+      
+      if(customer == null) return null;
+      
+      CustomerResponseDto customerResponse = new CustomerResponseDto();
+      customerResponse.setId(customer.getId());
+      customerResponse.setName(customer.getName());
+      customerResponse.setAccNo(customer.getAccNo());
+      customerResponse.setAccType(customer.getAccType());
+      customerResponse.setBalance(customer.getBalance());
+      customerResponse.setPanCardNo(customer.getPanCardNo());
+      return customerResponse;
+     
     }
 }
