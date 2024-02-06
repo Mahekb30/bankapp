@@ -50,6 +50,7 @@ public class CustomerController {
     public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
         try {
           Customer createdCustomer = customerService.createCustomer(customer);
+          System.out.println(createdCustomer);
           return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
         } catch(Exception e) {
           String errorMessage = "Error creating customer: " + e.getMessage();
@@ -60,7 +61,9 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+        System.out.println(id + " : " + customer);
         Customer updatedCustomer = customerService.updateCustomer(id, customer);
+        System.out.println(updatedCustomer);
         if (updatedCustomer != null) {
             return ResponseEntity.ok(updatedCustomer);
         } else {

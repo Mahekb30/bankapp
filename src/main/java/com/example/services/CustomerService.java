@@ -60,4 +60,9 @@ public class CustomerService {
           return false;
       }
   }
+
+    public CustomerService(CustomerRepository customerRepository) {
+      super();
+      this.customerRepository = customerRepository;
+    }
 }
