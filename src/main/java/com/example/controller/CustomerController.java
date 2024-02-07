@@ -2,6 +2,8 @@ package com.example.controller;
 
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,10 @@ import com.example.services.CustomerService;
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
+  
+    //creating a logger 
+    Logger logger = LoggerFactory.getLogger(CustomerController.class);
+  
     @Autowired
     private CustomerService customerService;
 
@@ -31,6 +37,7 @@ public class CustomerController {
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Long accNo
     ) {
+        logger.info("Getting all customers");
         List<CustomerResponseDto> customers = customerService.getAllCustomers(balance, name, accNo);
         if (customers.size() <= 0) {
           return ResponseEntity.notFound().build();
@@ -40,6 +47,7 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable int id) {
+      logger.info("Getting customer with id: {}", id);
       CustomerResponseDto customer = customerService.getCustomerById(id);
         if (customer != null) {
           return ResponseEntity.ok(customer);
@@ -51,18 +59,20 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Object> createCustomer(@RequestBody CustomerRequestDto customer) {
         try {
+          logger.info("Creating customer: {}", customer);
           CustomerResponseDto createdCustomer = customerService.createCustomer(customer);
           return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
         } catch(Exception e) {
           String errorMessage = "Error creating customer: " + e.getMessage();
-          System.err.println(errorMessage);
+          logger.error(errorMessage, e);
           return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable int id, @RequestBody CustomerRequestDto customer) {
-        CustomerResponseDto updatedCustomer = customerService.updateCustomer(id, customer);
+      logger.info("Updating customer with id: {}", id);  
+      CustomerResponseDto updatedCustomer = customerService.updateCustomer(id, customer);
         if (updatedCustomer != null) {
             return ResponseEntity.ok(updatedCustomer);
         } else {
@@ -72,6 +82,7 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable int id) {
+        logger.info("Deleting customer with id: {}", id);
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
