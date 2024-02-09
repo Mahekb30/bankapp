@@ -1,21 +1,11 @@
-package com.example.entities;
+package com.example.dtos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
-@Entity
-public class Customer {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+public class CustomerResponseDto {
   private int id;
   
   private String name;
   
-  @Column(unique = true)
   private long accNo;
   
   private String accType;
@@ -40,7 +30,7 @@ public class Customer {
     this.name = name;
   }
 
-  public Long getAccNo() {
+  public long getAccNo() {
     return accNo;
   }
 
@@ -64,7 +54,16 @@ public class Customer {
     this.panCardNo = panCardNo;
   }
 
-  public Customer(int id, String name, long accNo, String accType, String panCardNo, double balance) {
+  public Double getBalance() {
+    return balance;
+  }
+
+  public void setBalance(Double balance) {
+    this.balance = balance;
+  }
+
+  public CustomerResponseDto(int id, String name, long accNo, String accType, String panCardNo,
+      Double balance) {
     super();
     this.id = id;
     this.name = name;
@@ -76,21 +75,13 @@ public class Customer {
 
   @Override
   public String toString() {
-    return "Customer [id=" + id + ", name=" + name + ", accNo=" + accNo + ", accType=" + accType
-        + ", panCardNo=" + panCardNo + ", balance=" + balance + "]";
+    return "CustomerResponseDto [id=" + id + ", name=" + name + ", accNo=" + accNo + ", accType="
+        + accType + ", panCardNo=" + panCardNo + ", balance=" + balance + "]";
   }
 
-  public Customer() {
+  public CustomerResponseDto() {
     super();
     // TODO Auto-generated constructor stub
-  }
-
-  public Double getBalance() {
-    return balance;
-  }
-
-  public void setBalance(double balance) {
-    this.balance = balance;
   }
   
 }
