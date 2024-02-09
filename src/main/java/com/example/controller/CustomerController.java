@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.dtos.CustomerRequestDto;
 import com.example.dtos.CustomerResponseDto;
+import com.example.dtos.LoanResponseDto;
 import com.example.entities.Customer;
 import com.example.services.CustomerService;
 
@@ -55,6 +56,18 @@ public class CustomerController {
           return ResponseEntity.notFound().build();
       }
     }
+    
+    @GetMapping("/loan/{id}")
+    public ResponseEntity<LoanResponseDto> getLoanByCustomerId(@PathVariable int id) {
+      logger.info("Getting customer loan with id: {}", id);
+      LoanResponseDto loanData = customerService.getLoanByCustomerId(id);
+        if (loanData != null) {
+          return ResponseEntity.ok(loanData);
+      } else {
+          return ResponseEntity.notFound().build();
+      }
+    }
+
 
     @PostMapping
     public ResponseEntity<Object> createCustomer(@RequestBody CustomerRequestDto customer) {

@@ -4,16 +4,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import com.example.dao.CustomerRepository;
 import com.example.dtos.CustomerRequestDto;
 import com.example.dtos.CustomerResponseDto;
+import com.example.dtos.LoanResponseDto;
 import com.example.entities.Customer;
 
 @Service
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+    
+    @Lazy
+    private RestTemplate template = new RestTemplate();
 
     public List<CustomerResponseDto> getAllCustomers(String balance, String name, Long accNo) {
       
@@ -30,6 +36,12 @@ public class CustomerService {
 
     public CustomerResponseDto getCustomerById(int id) {
         return mapToDto(customerRepository.findById(id).orElse(null));
+    }
+    
+    public LoanResponseDto getLoanByCustomerId(int id) {
+      
+      LoanResponseDto loanData = template.getForObject("http://localhost:8082/loans/customer/"+id, LoanResponseDto.class);
+      return loanData;
     }
 
     public CustomerResponseDto createCustomer(CustomerRequestDto customer) {
